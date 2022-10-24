@@ -12,11 +12,14 @@ import java.io.ObjectOutputStream;
  */
 public abstract class PacketContent {
 
-	public static final int ACKPACKET= 10;
-	public static final int FILEINFO= 100;
+	public static final int ACKPACKET=    1;
+	public static final int FILEINFO=     2;
+	public static final int FILESEND=     3;
+	public static final int GETFILE=      4;
+	public static final int ENDFILE=      5;
+	public static final int NOFILE=       6;
 
 	int type= 0;
-
 	/**
 	 * Constructs an object out of a datagram packet.
 	 * @param packet Packet to analyse.
@@ -43,6 +46,18 @@ public abstract class PacketContent {
 				break;
 			case FILEINFO:
 				content= new FileInfoContent(oin);
+				break;
+			case FILESEND:
+				content = new FileContent(oin);
+				break;
+			case GETFILE:
+				content = new GetFileContent(oin);
+				break;
+			case ENDFILE:
+				content = new EndContent();
+				break;
+			case NOFILE:
+				content = new NoFile();
 				break;
 			default:
 				content= null;

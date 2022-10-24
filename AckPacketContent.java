@@ -8,15 +8,17 @@ import java.io.ObjectOutputStream;
 public class AckPacketContent extends PacketContent {
 
 	String info;
+	int size;
 
 	/**
 	 * Constructor that takes in information about a file.
 	 * @param filename Initial filename.
 	 * @param size Size of filename.
 	 */
-	AckPacketContent(String info) {
+	AckPacketContent(String info, int size) {
 		type= ACKPACKET;
 		this.info = info;
+		this.size = size;
 	}
 
 	/**
@@ -27,6 +29,7 @@ public class AckPacketContent extends PacketContent {
 		try {
 			type= ACKPACKET;
 			info= oin.readUTF();
+			size= oin.readInt();
 		}
 		catch(Exception e) {e.printStackTrace();}
 	}
@@ -38,6 +41,7 @@ public class AckPacketContent extends PacketContent {
 	protected void toObjectOutputStream(ObjectOutputStream oout) {
 		try {
 			oout.writeUTF(info);
+			oout.writeInt(size);
 		}
 		catch(Exception e) {e.printStackTrace();}
 	}
@@ -50,7 +54,7 @@ public class AckPacketContent extends PacketContent {
 	 * @return Returns the content of the packet as String.
 	 */
 	public String toString() {
-		return "ACK:" + info;
+		return "ACK:" + info + "\nPrev Packet Size: " + size;
 	}
 
 	/**

@@ -1,8 +1,18 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 public class Server extends Node {
 	static final int DEFAULT_PORT = 50001;
+	static SocketAddress CLIENT_PORT;
+	static SocketAddress WORKER_PORT;
+	static int WORKERS_WTIHOUT_FILE = 0;
+	static InetSocketAddress[] workerAddresses = {
+		new InetSocketAddress("worker1", 50002), 
+		new InetSocketAddress("worker2", 50003),
+		new InetSocketAddress("worker3", 50004),
+	};
 	/*
 	 *
 	 */
@@ -19,18 +29,46 @@ public class Server extends Node {
 	 */
 	public void onReceipt(DatagramPacket packet) {
 		try {
-			System.out.println("Received packet");
 
 			PacketContent content= PacketContent.fromDatagramPacket(packet);
-
-			if (content.getType()==PacketContent.FILEINFO) {
-				System.out.println("File name: " + ((FileInfoContent)content).getFileName());
-				System.out.println("File size: " + ((FileInfoContent)content).getFileSize());
-
-				DatagramPacket response;
-				response= new AckPacketContent("OK - Received this").toDatagramPacket();
-				response.setSocketAddress(packet.getSocketAddress());
-				socket.send(response);
+			System.out.println("Received packet" + content.toString());
+			switch (content.getType()) {
+				case PacketContent.GETFILE:
+					CLIENT_PORT = packet.getSocketAddress();
+					for(InetSocketAddress dstAddress : workerAddresses){
+						packet.setSocketAddress(dstAddress);
+						socket.send(packet);
+					}
+					break;
+				case PacketContent.FILEINFO:
+					if(WORKER_PORT == null){
+						WORKER_PORT = packet.getSocketAddress();
+						packet.setSocketAddress(CLIENT_PORT);
+						socket.send(packet);
+					}
+					break;
+				case PacketContent.ACKPACKET:
+					packet.setSocketAddress(WORKER_PORT);
+					socket.send(packet);
+					break;
+				case PacketContent.ENDFILE:
+					packet.setSocketAddress(CLIENT_PORT);
+					WORKERS_WTIHOUT_FILE = 0;
+					CLIENT_PORT = null;
+					WORKER_PORT = null;
+					socket.send(packet);
+					break;
+				case PacketContent.FILESEND:
+					packet.setSocketAddress(CLIENT_PORT);
+					socket.send(packet);
+					break;
+				case PacketContent.NOFILE:
+					WORKERS_WTIHOUT_FILE += 1;
+					if(WORKERS_WTIHOUT_FILE == workerAddresses.length){
+						packet.setSocketAddress(CLIENT_PORT);
+						socket.send(packet);
+					}
+					break;
 			}
 		}
 		catch(Exception e) {e.printStackTrace();}

@@ -7,7 +7,6 @@ import java.io.ObjectOutputStream;
  */
 public class FileInfoContent extends PacketContent {
 
-	String filename;
 	int size;
 
 	/**
@@ -15,9 +14,8 @@ public class FileInfoContent extends PacketContent {
 	 * @param filename Initial filename.
 	 * @param size Size of filename.
 	 */
-	FileInfoContent(String filename, int size) {
+	FileInfoContent(int size) {
 		type= FILEINFO;
-		this.filename = filename;
 		this.size= size;
 	}
 
@@ -28,7 +26,6 @@ public class FileInfoContent extends PacketContent {
 	protected FileInfoContent(ObjectInputStream oin) {
 		try {
 			type= FILEINFO;
-			filename= oin.readUTF();
 			size= oin.readInt();
 		}
 		catch(Exception e) {e.printStackTrace();}
@@ -40,7 +37,6 @@ public class FileInfoContent extends PacketContent {
 	 */
 	protected void toObjectOutputStream(ObjectOutputStream oout) {
 		try {
-			oout.writeUTF(filename);
 			oout.writeInt(size);
 		}
 		catch(Exception e) {e.printStackTrace();}
@@ -53,16 +49,7 @@ public class FileInfoContent extends PacketContent {
 	 * @return Returns the content of the packet as String.
 	 */
 	public String toString() {
-		return "Filename: " + filename + " - Size: " + size;
-	}
-
-	/**
-	 * Returns the file name contained in the packet.
-	 *
-	 * @return Returns the file name contained in the packet.
-	 */
-	public String getFileName() {
-		return filename;
+		return "Size: " + size;
 	}
 
 	/**

@@ -4,7 +4,7 @@ import java.net.SocketException;
 import java.util.concurrent.CountDownLatch;
 
 public abstract class Node {
-	static final int PACKETSIZE = 65536;
+	static final int PACKETSIZE = 1200;
 
 	DatagramSocket socket;
 	Listener listener;

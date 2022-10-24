@@ -4,8 +4,10 @@
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  *
@@ -18,7 +20,11 @@ public class Client extends Node {
 	static final int DEFAULT_SRC_PORT = 50000;
 	static final int DEFAULT_DST_PORT = 50001;
 	static final String DEFAULT_DST_NODE = "server";
+	File reqFile;
+	byte[] fileData;
+	int bytesRec = 0;
 	InetSocketAddress dstAddress;
+	String fname;
 
 	/**
 	 * Constructor
@@ -40,9 +46,58 @@ public class Client extends Node {
 	 */
 	public synchronized void onReceipt(DatagramPacket packet) {
 		PacketContent content= PacketContent.fromDatagramPacket(packet);
-
-		System.out.println(content.toString());
-		this.notify();
+		DatagramPacket response;
+		System.out.println("Recieved packet: " + content.toString());
+		switch (content.type) {
+			case PacketContent.FILEINFO:
+				System.out.println("It was a FILEINFO CONTENT");
+				fileData = new byte [((FileInfoContent) content).size];
+				response= new AckPacketContent("OK - Received this", 0).toDatagramPacket();
+				response.setSocketAddress(packet.getSocketAddress());
+				try {
+					socket.send(response);
+					System.out.println("Send ACKPACKET");
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				break;
+			case PacketContent.FILESEND:
+				for(int i = 0; i < ((FileContent)content).file.length; i++){
+					fileData[i + bytesRec] = ((FileContent)content).file[i];
+				}
+				bytesRec += ((FileContent)content).file.length;
+				response= new AckPacketContent("OK - Received this", ((FileContent)content).file.length).toDatagramPacket();
+				response.setSocketAddress(packet.getSocketAddress());
+				try {
+					socket.send(response);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				break;
+			case PacketContent.NOFILE:
+				System.out.println("No file with that name could be found");
+				reqFile = null;
+				fileData = null;
+				fname = null;
+				bytesRec = 0;
+				this.notify();
+				break;
+			case PacketContent.ENDFILE:
+				try {
+					reqFile.createNewFile();
+				} catch (Exception e){
+					System.out.println("An exception occurred creating new file: " + e);
+				}
+				try {
+					Files.write(reqFile.toPath(), fileData);
+				} catch (IOException e) {e.printStackTrace();}
+				reqFile = null;
+				fileData = null;
+				fname = null;
+				bytesRec = 0;
+				this.notify();
+				break;
+		}
 	}
 
 
@@ -51,37 +106,22 @@ public class Client extends Node {
 	 *
 	 */
 	public synchronized void start() throws Exception {
-		String fname;
-		File file= null;
-		FileInputStream fin= null;
 
-		FileInfoContent fcontent;
-
-		int size;
-		byte[] buffer= null;
+		GetFileContent fcontent;
 		DatagramPacket packet= null;
 
-		fname= "message.txt";//terminal.readString("Name of file: ");
+		fname= System.console().readLine("Name of file: ");
 
-		file= new File(fname);				// Reserve buffer for length of file and read file
-		buffer= new byte[(int) file.length()];
-		fin= new FileInputStream(file);
-		size= fin.read(buffer);
-		if (size==-1) {
-			fin.close();
-			throw new Exception("Problem with File Access:"+fname);
-		}
-		System.out.println("File size: " + buffer.length);
+		reqFile= new File(fname);				// Reserve buffer for length of file and read file
 
-		fcontent= new FileInfoContent(fname, size);
+		fcontent= new GetFileContent(fname);
 
-		System.out.println("Sending packet w/ name & length"); // Send packet with file name and length
+		System.out.println("Sending packet w/ name" + fname); // Send packet with file name
 		packet= fcontent.toDatagramPacket();
 		packet.setSocketAddress(dstAddress);
 		socket.send(packet);
 		System.out.println("Packet sent");
 		this.wait();
-		fin.close();
 	}
 
 
