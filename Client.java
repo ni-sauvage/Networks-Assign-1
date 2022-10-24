@@ -66,6 +66,20 @@ public class Client extends Node {
 					fileData[i + bytesRec] = ((FileContent)content).file[i];
 				}
 				bytesRec += ((FileContent)content).file.length;
+				if(bytesRec == fileData.length){
+					try {
+						reqFile.createNewFile();
+						Files.write(reqFile.toPath(), fileData);
+					} catch (Exception e){
+						e.printStackTrace();
+						System.out.println("An exception occurred creating new file: " + e);
+					}
+					reqFile = null;
+					fileData = null;
+					fname = null;
+					bytesRec = 0;
+					this.notify();
+				}
 				response= new AckPacketContent("OK - Received this", ((FileContent)content).file.length).toDatagramPacket();
 				response.setSocketAddress(packet.getSocketAddress());
 				try {
@@ -76,21 +90,6 @@ public class Client extends Node {
 				break;
 			case PacketContent.NOFILE:
 				System.out.println("No file with that name could be found");
-				reqFile = null;
-				fileData = null;
-				fname = null;
-				bytesRec = 0;
-				this.notify();
-				break;
-			case PacketContent.ENDFILE:
-				try {
-					reqFile.createNewFile();
-				} catch (Exception e){
-					System.out.println("An exception occurred creating new file: " + e);
-				}
-				try {
-					Files.write(reqFile.toPath(), fileData);
-				} catch (IOException e) {e.printStackTrace();}
 				reqFile = null;
 				fileData = null;
 				fname = null;

@@ -35,6 +35,7 @@ public class Server extends Node {
 			switch (content.getType()) {
 				case PacketContent.GETFILE:
 					CLIENT_PORT = packet.getSocketAddress();
+					WORKERS_WTIHOUT_FILE = 0;
 					for(InetSocketAddress dstAddress : workerAddresses){
 						packet.setSocketAddress(dstAddress);
 						socket.send(packet);
@@ -49,13 +50,6 @@ public class Server extends Node {
 					break;
 				case PacketContent.ACKPACKET:
 					packet.setSocketAddress(WORKER_PORT);
-					socket.send(packet);
-					break;
-				case PacketContent.ENDFILE:
-					packet.setSocketAddress(CLIENT_PORT);
-					WORKERS_WTIHOUT_FILE = 0;
-					CLIENT_PORT = null;
-					WORKER_PORT = null;
 					socket.send(packet);
 					break;
 				case PacketContent.FILESEND:

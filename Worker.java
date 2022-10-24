@@ -41,11 +41,7 @@ public class Worker extends Node {
 					socket.send(response);
 					break;
 				case PacketContent.ACKPACKET:
-					if (fileContent == null) {
-						DatagramPacket end = new EndContent().toDatagramPacket();
-						end.setSocketAddress(packet.getSocketAddress());
-						socket.send(end);
-					} else {
+					if (fileContent != null) {
 						byte[] newData = new byte[fileContent.length - ((AckPacketContent)content).size];
 						for(int i = 0; i < newData.length; i++){
 							newData[i] = fileContent[((AckPacketContent)content).size + i];
