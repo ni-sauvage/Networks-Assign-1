@@ -11,8 +11,7 @@ public class FileInfoContent extends PacketContent {
 
 	/**
 	 * Constructor that takes in information about a file.
-	 * @param filename Initial filename.
-	 * @param size Size of filename.
+	 * @param size Size of file
 	 */
 	FileInfoContent(int size) {
 		type= FILEINFO;

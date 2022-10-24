@@ -1,19 +1,17 @@
 import java.io.ObjectOutputStream;
 
 /**
- * Class for packet content that represents file information
+ * Class for packet content that indicates file is not on machine
  *
  */
 public class NoFile extends PacketContent {
 
 	/**
-	 * Constructor that takes in information about a file.
-	 * @param filename Initial filename.
-	 * @param size Size of filename.
+	 * Constructor which does not take in parameters
 	 */
 NoFile() {
 	super.type = PacketContent.NOFILE;
-	/*No Content to display, simply signals end of file. */
+	/*No Content to display, simply signals file not found on machine */
 }
 
 	protected void toObjectOutputStream(ObjectOutputStream out) {}

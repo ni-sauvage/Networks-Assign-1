@@ -9,7 +9,7 @@ public class Worker extends Node {
 	File reqFile;
 	byte[] fileContent;
 	/*
-	 *
+	 *	Create a new worker on the network with a certain port
 	 */
 	Worker(int port) {
 		try {
@@ -19,9 +19,6 @@ public class Worker extends Node {
 		catch(java.lang.Exception e) {e.printStackTrace();}
 	}
 
-	/**
-	 * Assume that incoming packets contain a String and print the string.
-	 */
 	public void onReceipt(DatagramPacket packet) {
 		try {
 

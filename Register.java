@@ -13,7 +13,7 @@ public class Register extends PacketContent {
 	 */
 	Register() {
 	super.type = PacketContent.REGISTER;
-	/*No Content to display, simply signals end of file. */
+	/*No Content to display, simply register this worker */
 }
 
 	protected void toObjectOutputStream(ObjectOutputStream out) {}

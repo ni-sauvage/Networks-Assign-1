@@ -3,7 +3,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 /**
- * Class for packet content that represents file information
+ * Class for packet content that represents file data
  *
  */
 public class FileContent extends PacketContent {

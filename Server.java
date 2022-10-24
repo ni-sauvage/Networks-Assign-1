@@ -21,9 +21,6 @@ public class Server extends Node {
 		catch(java.lang.Exception e) {e.printStackTrace();}
 	}
 
-	/**
-	 * Assume that incoming packets contain a String and print the string.
-	 */
 	public void onReceipt(DatagramPacket packet) {
 		try {
 

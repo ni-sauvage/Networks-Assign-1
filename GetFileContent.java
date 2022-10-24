@@ -2,7 +2,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 /**
- * Class for packet content that represents file information
+ * Class for packet content that requests a file based on its name
  *
  */
 public class GetFileContent extends PacketContent {
