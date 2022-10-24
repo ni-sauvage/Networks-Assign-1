@@ -16,7 +16,7 @@ public abstract class PacketContent {
 	public static final int FILEINFO=     2;
 	public static final int FILESEND=     3;
 	public static final int GETFILE=      4;
-	public static final int ENDFILE=      5;
+	public static final int REGISTER=     5;
 	public static final int NOFILE=       6;
 
 	int type= 0;
@@ -53,8 +53,8 @@ public abstract class PacketContent {
 			case GETFILE:
 				content = new GetFileContent(oin);
 				break;
-			case ENDFILE:
-				content = new EndContent();
+			case REGISTER:
+				content = new Register();
 				break;
 			case NOFILE:
 				content = new NoFile();

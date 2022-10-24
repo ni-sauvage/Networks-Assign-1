@@ -2,17 +2,14 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.ArrayList;
 
 public class Server extends Node {
 	static final int DEFAULT_PORT = 50001;
 	static SocketAddress CLIENT_PORT;
 	static SocketAddress WORKER_PORT;
 	static int WORKERS_WTIHOUT_FILE = 0;
-	static InetSocketAddress[] workerAddresses = {
-		new InetSocketAddress("worker1", 50002), 
-		new InetSocketAddress("worker2", 50003),
-		new InetSocketAddress("worker3", 50004),
-	};
+	ArrayList<InetSocketAddress> workerAddresses = new ArrayList<InetSocketAddress>();
 	/*
 	 *
 	 */
@@ -59,10 +56,15 @@ public class Server extends Node {
 					break;
 				case PacketContent.NOFILE:
 					WORKERS_WTIHOUT_FILE += 1;
-					if(WORKERS_WTIHOUT_FILE == workerAddresses.length){
+					if(WORKERS_WTIHOUT_FILE == workerAddresses.size()){
 						packet.setSocketAddress(CLIENT_PORT);
 						socket.send(packet);
 					}
+					break;
+				case PacketContent.REGISTER:
+					workerAddresses.add(
+						(InetSocketAddress) packet.getSocketAddress()
+					);
 					break;
 			}
 		}

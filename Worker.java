@@ -2,9 +2,10 @@ import java.io.File;
 import java.nio.file.Files;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 
 public class Worker extends Node {
-	static final int DEFAULT_PORT = 50001;
+	static final InetSocketAddress SERVER_PORT = new InetSocketAddress("server", 50001);
 	File reqFile;
 	byte[] fileContent;
 	/*
@@ -71,6 +72,10 @@ public class Worker extends Node {
 
 	public synchronized void start() throws Exception {
 		System.out.println("Waiting for contact");
+		DatagramPacket packet;
+		packet= new Register().toDatagramPacket();
+		packet.setSocketAddress(SERVER_PORT);
+		socket.send(packet);
 		this.wait();
 	}
 
