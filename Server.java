@@ -34,6 +34,7 @@ public class Server extends Node {
 			System.out.println("Received packet" + content.toString());
 			switch (content.getType()) {
 				case PacketContent.GETFILE:
+					WORKER_PORT = null;
 					CLIENT_PORT = packet.getSocketAddress();
 					WORKERS_WTIHOUT_FILE = 0;
 					for(InetSocketAddress dstAddress : workerAddresses){
